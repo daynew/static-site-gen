@@ -1,6 +1,6 @@
 
 import unittest
-from convert import text_node_to_html_node, text_to_textnodes
+from convert import text_node_to_html_node, text_to_textnodes, markdown_to_blocks
 from textnode import TextNode, TextType
 
 
@@ -65,6 +65,26 @@ class TestConvert(unittest.TestCase):
             TextNode("link", TextType.LINK, "https://boot.dev"),
         ]
         self.assertEqual(expected, actual)
+
+    def test_markdown_to_blocks(self):
+        md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
 
 
 if __name__ == "__main__":
