@@ -1,4 +1,5 @@
 from enum import Enum
+from textnode import TextNode
 import re
 
 
@@ -9,6 +10,26 @@ class BlockType(Enum):
     QUOTE = "quote"
     UNORDERED_LIST = "unordered_list"
     ORDERED_LIST = "ordered_list"
+
+
+class BlockNode():
+    def __init__(self, type: BlockType, children: list[TextNode], props: dict[str, str] = {}):
+        self.type = type
+        self.children = children
+        self.props = props
+
+    def __eq__(self, other):
+        if not isinstance(other, BlockNode):
+            return False
+        if self.type != other.type:
+            return False
+        if self.children != other.children:
+            return False
+        return True
+
+    def __repr__(self) -> str:
+        children = map(lambda c: repr(c), self.children)
+        return f"BlockNode({self.type.value}, {",".join(children)})"
 
 
 def block_to_block_type(text: str) -> BlockType:
