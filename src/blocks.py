@@ -28,8 +28,14 @@ class BlockNode():
         return True
 
     def __repr__(self) -> str:
-        children = map(lambda c: repr(c), self.children)
-        return f"BlockNode({self.type.value}, {",".join(children)})"
+        lines = [f"BlockNode({self.type.value})"]
+        children = map(lambda c: indent_content(repr(c)), self.children)
+        lines.extend(children)
+        return "\n".join(lines)
+
+
+def indent_content(text: str) -> str:
+    return "\n".join(map(lambda line: "----" + line, text.splitlines()))
 
 
 def block_to_block_type(text: str) -> BlockType:
@@ -41,21 +47,21 @@ def block_to_block_type(text: str) -> BlockType:
     if len(lines) > 1 and lines[0] == "```" and lines[-1] == "```":
         return BlockType.CODE
 
-    is_quote = True
+    is_quote = len(lines) > 0
     for line in lines:
         if re.search(r"^>", line) is None:
             is_quote = False
     if is_quote:
         return BlockType.QUOTE
 
-    is_unordered_list = True
+    is_unordered_list = len(lines) > 0
     for line in lines:
         if re.search(r"^-\s", line) is None:
             is_unordered_list = False
     if is_unordered_list:
         return BlockType.UNORDERED_LIST
 
-    is_ordered_list = True
+    is_ordered_list = len(lines) > 0
     line_number = 1
     for line in lines:
         match = re.search(r"^(\d+)\.\s", line)

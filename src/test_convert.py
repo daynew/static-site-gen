@@ -1,6 +1,6 @@
 
 import unittest
-from convert import text_node_to_html_node, text_to_textnodes, markdown_to_blocks, blocks_to_block_nodes
+from convert import text_node_to_html_node, text_to_textnodes, markdown_to_blocks, blocks_to_block_nodes, markdown_to_html_node
 from textnode import TextNode, TextType
 from blocks import BlockNode, BlockType
 
@@ -92,7 +92,7 @@ This is the same paragraph on a new line
 # Heading 1
 
 ```
-Some code
+Some _code_
 in a block
 ```
 
@@ -111,7 +111,7 @@ A paragraph with an [example link](https://example.com)
         heading_block = BlockNode(
             BlockType.HEADING, [TextNode("Heading 1", TextType.TEXT)])
         code_block = BlockNode(
-            BlockType.CODE, [TextNode("Some code\nin a block", TextType.TEXT)])
+            BlockType.CODE, [TextNode("Some _code_\nin a block", TextType.TEXT)])
         quote_block = BlockNode(
             BlockType.QUOTE, [TextNode("A nice quote", TextType.TEXT)])
         u_list_block = BlockNode(
@@ -136,6 +136,75 @@ A paragraph with an [example link](https://example.com)
             paragraph_block,
         ]
         self.assertEqual(expected, block_nodes)
+
+    def test_paragraphs(self):
+        md = """
+This is **bolded** paragraph
+text in a p
+tag here
+
+This is another paragraph with _italic_ text and `code` here
+
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+        )
+
+    def test_codeblock(self):
+        md = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff</code></pre></div>",
+        )
+
+    def test_heading(self):
+        md = "## Heading 2"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = "<div><h2>Heading 2</h2></div>"
+        self.assertEqual(expected, html)
+
+    def test_ul(self):
+        md = """
+- item a
+- item b
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = "<div><ul><li>item a</li><li>item b</li></ul></div>"
+        self.assertEqual(expected, html)
+
+    def test_ol(self):
+        md = """
+1. item a
+2. item b
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = "<div><ol><li>item a</li><li>item b</li></ol></div>"
+        self.assertEqual(expected, html)
+
+    def test_quote(self):
+        md = """
+> Line 1
+> Line 2
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = "<div><blockquote>Line 1\nLine 2</blockquote></div>"
+        self.assertEqual(expected, html)
 
 
 if __name__ == "__main__":

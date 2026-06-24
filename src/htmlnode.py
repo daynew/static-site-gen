@@ -67,7 +67,7 @@ class ParentNode(HTMLNode):
         if self.tag is None:
             raise ValueError("ParentNode must have a tag")
         if self.children is None or len(self.children) == 0:
-            raise ValueError("ParentNode must have child nodes")
+            raise ValueError(f"ParentNode('{self.tag}') must have child nodes")
         html = []
         html.append(f'<{self.tag}{self.props_to_html()}>')
         for child in self.children:
