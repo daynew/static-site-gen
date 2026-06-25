@@ -31,8 +31,9 @@ def copy_static(src: str, dest: str):
 
 
 def __main__():
-    copy_static("./static", "./public")
-    generate_md("./content", "./template.html", "./public")
+    basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
+    copy_static("./static", "./docs")
+    generate_md("./content", "./template.html", "./docs", basepath)
 
 
 __main__()

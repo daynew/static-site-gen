@@ -3,7 +3,7 @@ from convert import markdown_to_html_node
 from extract_markdown import extract_title
 
 
-def generate_page(src_path: str, template_path: str, dest_path: str):
+def generate_page(src_path: str, template_path: str, dest_path: str, basepath: str):
     print(f"Generating page from {src_path} to {
           dest_path} using {template_path}")
 
@@ -17,6 +17,8 @@ def generate_page(src_path: str, template_path: str, dest_path: str):
     src_title = extract_title(src_md)
     template_html = template_content.replace(
         "{{ Title }}", src_title).replace("{{ Content }}", src_html)
+    template_html = template_html.replace('href="/', f'href="{basepath}')
+    template_html = template_html.replace('src="/', f'src="{basepath}')
 
     dest_dir = os.path.dirname(dest_path)
     os.makedirs(dest_dir, exist_ok=True)
@@ -24,12 +26,13 @@ def generate_page(src_path: str, template_path: str, dest_path: str):
         dest_file.write(template_html)
 
 
-def generate_md(src_path: str, template_path: str, dest_path: str):
+def generate_md(src_path: str, template_path: str, dest_path: str, basepath: str):
     for filename in os.listdir(src_path):
         src_file_path = os.path.join(src_path, filename)
         if os.path.isfile(src_file_path) and filename.endswith(".md"):
             dest_file_path = os.path.join(dest_path, filename[:-3] + ".html")
-            generate_page(src_file_path, template_path, dest_file_path)
+            generate_page(src_file_path, template_path,
+                          dest_file_path, basepath)
         elif os.path.isdir(src_file_path):
             generate_md(src_file_path, template_path,
-                        os.path.join(dest_path, filename))
+                        os.path.join(dest_path, filename), basepath)
