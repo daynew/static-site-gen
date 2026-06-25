@@ -1,4 +1,5 @@
 from textnode import TextNode, TextType
+from generate import generate_page, generate_md
 import os
 import sys
 import shutil
@@ -31,6 +32,7 @@ def copy_static(src: str, dest: str):
 
 def __main__():
     copy_static("./static", "./public")
+    generate_md("./content", "./template.html", "./public")
 
 
 __main__()
